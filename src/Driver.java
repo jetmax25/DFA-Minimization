@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -84,15 +85,37 @@ public class Driver {
 				}
 			}
 			
+			
+			
+			boolean dif[] = new boolean[numStates];
+			int count = 0;
 			for(int j = 0; j < numStates; j++)
 			{
-				for(int k = j; k < numStates; k++)
-				{
-					System.out.print(" " + possibleMerge[j][k]);
-					
+				if(!dif[j]){
+					states[j].setNum(count++);
+					for(int k = j + 1; k < numStates; k++)
+					{
+						if( possibleMerge[j][k] == 0){
+							states[k].combined(states[j]);
+							dif[k] = true;
+						}
+						
+					}
 				}
-				System.out.println();
 			}
+			
+			for(int j = 0; j < numStates; j++)
+			{
+				if(!dif[j]){
+					for(int k = 0; k < numLetters; k++){
+						
+						System.out.print(states[j].getTransition(k).getNum() + " "); 
+					}
+					System.out.println();
+				}
+			}
+			
+			
 		}
 	}
 	
