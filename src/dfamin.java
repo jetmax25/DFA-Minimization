@@ -1,15 +1,20 @@
+/**Michael Isasi
+ * COT 4200
+ * 03/15/15
+ */
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class Driver {
+public class dfamin {
 	static State states[];
 	static State acceptStates[];
 	static State regStates[];
 	static int possibleMerge[][];
 	static int numLetters;
 	static boolean done[][];
-	
+	static boolean  dif[];
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Scanner in = new Scanner(System.in);
@@ -43,6 +48,7 @@ public class Driver {
 					states[j].addTransition(states[in.nextInt()]);
 				}
 			}
+			
 			acceptStates = new State[numFinal];
 			regStates = new State[numStates - numFinal];
 			int f = 0, r = 0;
@@ -87,26 +93,44 @@ public class Driver {
 			
 			
 			
-			boolean dif[] = new boolean[numStates];
+			dif = new boolean[numStates];
+			connected(0);
+//			for(int j = 0; j < numStates; j++)
+//			{
+//				System.out.println("connected " + j + " " +  dif[j] );
+//			}
 			int count = 0;
+			int finalCount = 0; 
 			for(int j = 0; j < numStates; j++)
 			{
-				if(!dif[j]){
+				if(dif[j]){
+					if(states[j].isFinal()) finalCount++;
 					states[j].setNum(count++);
 					for(int k = j + 1; k < numStates; k++)
 					{
 						if( possibleMerge[j][k] == 0){
 							states[k].combined(states[j]);
-							dif[k] = true;
+							dif[k] = false;
 						}
 						
 					}
 				}
 			}
 			
+			
+			System.out.println("DFA #" + (i + 1) +":");
+			System.out.println(count + " " + numLetters);
+			System.out.print(finalCount + " ");
 			for(int j = 0; j < numStates; j++)
 			{
-				if(!dif[j]){
+				if(dif[j]){
+					if(states[j].isFinal()) System.out.print(states[j].getNum() + " "); 
+				}
+			}
+			System.out.print("\n");
+			for(int j = 0; j < numStates; j++)
+			{
+				if(dif[j]){
 					for(int k = 0; k < numLetters; k++){
 						
 						System.out.print(states[j].getTransition(k).getNum() + " "); 
@@ -149,4 +173,63 @@ public class Driver {
 		return merge;
 	}
 
+	static void connected(int num)
+	{
+		if(dif[num] ) return;
+		
+		dif[num] = true; 
+	
+		for(int j = 0; j < numLetters; j++){
+			connected(states[num].getTransition(j).getNum());
+		}
+	}
+}
+ class State {
+	private int num;
+	private boolean finalState;
+	ArrayList<State> transition;
+	private State combined; 
+	
+	public State(int num){
+		this.num = num;
+		finalState = false;
+		transition = new ArrayList<State>();
+		combined = null;
+	}
+	
+	public void setFinal(){
+		finalState = true; 
+	}
+	
+	public boolean isFinal()
+	{
+		return finalState;
+	}
+	
+	public void addTransition(State s)
+	{
+		transition.add(s);
+	}
+	
+	public State getTransition(int num)
+	{
+		if(combined != null){
+			return combined.getTransition(num);
+		}
+		return transition.get(num);
+	}
+	
+	public int getNum()
+	{
+		if(combined != null) return combined.getNum();
+		return num;
+	}
+	public void setNum(int n)
+	{
+		num = n;
+	}
+	public void combined(State s)
+	{
+		this.combined = s;  
+	}
 }
